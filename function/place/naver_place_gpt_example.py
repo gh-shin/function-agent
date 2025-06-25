@@ -15,6 +15,7 @@ from .naver_place import (
 )
 import openai
 import json
+from ..tools import naver_search_poi
 
 # 환경 변수 로딩
 load_dotenv()
@@ -25,20 +26,7 @@ client = openai.OpenAI(api_key=OPENAI_API_KEY)
 
 # Function calling에 사용할 함수 정의 (OpenAI function schema)
 openai_function_schema = [
-    {
-        "name": "search_naver_place",
-        "description": "네이버 지역 검색 API를 사용하여 장소 정보를 검색합니다.",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "query": {"type": "string", "description": "검색어 (예: '카페', '맛집')"},
-                "display": {"type": "integer", "description": "검색 결과 개수 (1~5)", "default": 5},
-                "start": {"type": "integer", "description": "검색 시작 위치 (1~5)", "default": 1},
-                "sort": {"type": "string", "enum": ["random", "comment"], "description": "정렬 방법. 사람들의 리뷰가 많은 순서대로의 추천이 필요한 경우, 'comment'를 사용할 수 있습니다."},
-            },
-            "required": ["query"],
-        },
-    }
+    naver_search_poi
 ]
 
 async def gpt_function_calling_example() -> None:
@@ -50,12 +38,13 @@ async def gpt_function_calling_example() -> None:
         없음
     """
     # 1. 사용자가 자연어로 질문
-    user_message = "강서구에 장모님 장인어른 처형네와 같이 갈만한 점심 음식점을 추천해줘."
+    user_message = "강서구에 장모님 장인어른 처형네와 같이 갈만한 점심먹을건데 갈만한데 없을까? 술도 같이 좀 한 잔 하면 좋겠는데."
 
     # 2. OpenAI GPT-4.1 function calling API 호출 (실제 function call 예시)
     response = client.chat.completions.create(
         model="gpt-4.1",  # gpt-4.1 function calling 지원 모델
         messages=[
+            {"role":"system", "content":"link필드가 있다면, 사용자가 클릭해 이동할 수 있도록 응답해야합니다."},
             {"role": "user", "content": user_message},
         ],
         functions=openai_function_schema,
@@ -64,7 +53,7 @@ async def gpt_function_calling_example() -> None:
 
     # 3. GPT가 함수 호출을 제안하면, 파라미터 추출
     message = response.choices[0].message
-    print(f'GPT message: {message}')
+    
     if message.function_call:
         func_name = message.function_call.name
         arguments = message.function_call.arguments
@@ -72,6 +61,7 @@ async def gpt_function_calling_example() -> None:
         # 4. 실제 함수 실행 (비동기)
         req = NaverPlaceSearchRequest(**args_dict)
         result = await search_naver_place(req)
+        print(result)
         # 5. 결과를 다시 GPT에 전달하여 자연어 응답 생성
         followup = client.chat.completions.create(
             model="gpt-4.1",

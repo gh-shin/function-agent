@@ -15,7 +15,7 @@ class NaverPlaceItem(BaseModel):
 
     Attributes:
         title (str): 업체, 기관의 이름
-        link (str): 업체, 기관의 상세 정보 URL
+        link (str): 업체, 기관의 상세 정보 URL (원문 그대로 반환)
         category (str): 업체, 기관의 분류 정보
         description (str): 업체, 기관에 대한 설명
         address (str): 업체, 기관명의 지번 주소
@@ -24,13 +24,21 @@ class NaverPlaceItem(BaseModel):
         mapy (int): 장소의 y 좌표(WGS84)
     """
     title: str
-    link: str
+    link: str  # 원문 그대로 반환 (가공/디코딩 없이)
     category: str
     description: str
     address: str
     roadAddress: str
     mapx: int
     mapy: int
+
+    class Config:
+        # 원본 필드명 그대로 사용, 변환/디코딩 없이
+        allow_population_by_field_name = True
+        # JSON 직렬화 시 HTML 이스케이프 방지
+        json_encoders = {
+            str: lambda v: v,
+        }
 
 class NaverPlaceSearchResponse(BaseModel):
     """네이버 지역 검색 API 응답 모델
@@ -89,7 +97,7 @@ async def search_naver_place(
         response = await client.get(url, headers=headers, params=params)
         response.raise_for_status()
         data = response.json()
-        print(f'receive naver place: {data}')
+        # print(f'receive naver place: {data}')
         # 네이버 API의 응답 필드명을 그대로 사용
         return NaverPlaceSearchResponse(
             total=data["total"],
