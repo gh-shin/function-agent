@@ -241,18 +241,26 @@ def summarize_conversation_in_mails(person_name_or_email: str):
     except HttpError as error:
         return f"대화 요약 중 에러 발생: {error}"
 
+# --- 이메일 에이전트 생성 함수 ---
+def create_mail_agent_executor():
+    """
+    Gmail API를 사용하는 전문 이메일 에이전트(AgentExecutor)를 생성합니다.
+    메일 검색, 초안 작성, 대화 요약 기능을 제공합니다.
+    """
+    prompt = ChatPromptTemplate.from_messages([
+        ("system", "You are a specialized email assistant. 사용자의 이메일 관련 요청을 처리합니다. '나'는 항상 사용자 자신을 의미합니다. 오늘 날짜는 {today}입니다."),
+        MessagesPlaceholder(variable_name="chat_history", optional=True),
+        ("human", "{input}"),
+        MessagesPlaceholder(variable_name="agent_scratchpad"),
+    ])
 
-prompt = ChatPromptTemplate.from_messages([
-    ("system", "You are a helpful AI assistant. 현재 날짜는 {today} 입니다. 사용자의 요청을 분석하여 적절한 도구를 사용하세요."),
-    MessagesPlaceholder(variable_name="chat_history", optional=True),
-    ("human", "{input}"),
-    MessagesPlaceholder(variable_name="agent_scratchpad"),
-])
-
-llm = ChatOpenAI(model="gpt-4.1-mini", temperature=0)
-tools = [find_mails, draft_mail, summarize_conversation_in_mails]
-agent = create_openai_functions_agent(llm, tools, prompt)
-agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
+    llm = ChatOpenAI(model="gpt-4.1-mini", temperature=0)
+    tools = [find_mails, draft_mail, summarize_conversation_in_mails]
+    
+    agent = create_openai_functions_agent(llm, tools, prompt)
+    agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=False)
+    
+    return agent_executor
 
 # if __name__ == "__main__":
 #     load_dotenv()
@@ -279,7 +287,7 @@ agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
 # --- 멀티턴 대화를 위한 메인 실행 블록 ---
 if __name__ == "__main__":
     load_dotenv()
-    
+    mail_agent = create_mail_agent_executor()
     chat_history = []
     
     today_str = datetime.now().strftime("%Y-%m-%d")
@@ -294,7 +302,7 @@ if __name__ == "__main__":
                 print("어시스턴트를 종료합니다.")
                 break
 
-            result = agent_executor.invoke({
+            result = mail_agent.invoke({
                 "input": user_input,
                 "today": today_str,
                 "chat_history": chat_history 
