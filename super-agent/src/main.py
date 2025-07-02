@@ -20,16 +20,10 @@ from function.shopping.shopping_tools import *
 
 
 
-
-
-
-
-
-
-
-
-
-
+business_tools = []
+finance_tools = []
+life_tools = []
+search_tools = []
 
 
 
