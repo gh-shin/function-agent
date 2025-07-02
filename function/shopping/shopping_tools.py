@@ -116,11 +116,10 @@
 
 #         if add_cart_list:
 #             result = collection.insert_many(add_cart_list)
-        
+
 #         return '삽입 완료'
 #     except:
 #         return '삽입 불가능한 상태'
-
 
 
 # async def get_shopping_response(user_prompt):
@@ -176,20 +175,20 @@ from pymongo.errors import ConnectionFailure
 from langchain_openai import ChatOpenAI
 from langchain.agents import AgentExecutor, create_openai_functions_agent
 from langchain_core.tools import tool
-from langchain_core.pydantic_v1 import BaseModel, Field 
+from langchain_core.pydantic_v1 import BaseModel, Field
 from langchain import hub
 
 load_dotenv()
 NAVER_CLIENT_ID = os.getenv("NAVER_CLIENT_ID", "")
 NAVER_CLIENT_SECRET = os.getenv("NAVER_CLIENT_SECRET", "")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
-MONGODB_URI = os.getenv('MONGODB_URI')
-
+MONGODB_URI = os.getenv("MONGODB_URI")
 
 
 class NaverShoppingSearchInput(BaseModel):
-    query: str = Field(description="상품 혹은 유저가 찾고자 하는 상품의 키워드 e.g., '파란 신발', '서정적인 책', '보온 텀블러'")
-
+    query: str = Field(
+        description="상품 혹은 유저가 찾고자 하는 상품의 키워드 e.g., '파란 신발', '서정적인 책', '보온 텀블러'"
+    )
 
 
 @tool(args_schema=NaverShoppingSearchInput)
@@ -202,7 +201,7 @@ async def get_naver_search_results(query: str) -> Dict[str, Any]:
     }
     params = {
         "query": query,
-        "display": "5",  
+        "display": "5",
         "start": "1",
         "sort": "sim",
         "filter": "naverpay",
@@ -215,21 +214,28 @@ async def get_naver_search_results(query: str) -> Dict[str, Any]:
     return data
 
 
-
-
 class AddProductToCartInput(BaseModel):
-    product_names: List[str] = Field(description="장바구니에 추가하고자 하는 상품 이름 목록")
-    product_urls: List[str] = Field(description="해당 상품의 URL. product_names와 길이가 같아야 하며, 만약 URL이 없다면 공백을 삽입")
-    prices: List[str] = Field(description="해당 상품의 가격. product_names와 길이가 같아야 하며, 만약 가격이 없다면 공백을 삽입")
+    product_names: List[str] = Field(
+        description="장바구니에 추가하고자 하는 상품 이름 목록"
+    )
+    product_urls: List[str] = Field(
+        description="해당 상품의 URL. product_names와 길이가 같아야 하며, 만약 URL이 없다면 공백을 삽입"
+    )
+    prices: List[str] = Field(
+        description="해당 상품의 가격. product_names와 길이가 같아야 하며, 만약 가격이 없다면 공백을 삽입"
+    )
+
 
 @tool(args_schema=AddProductToCartInput)
-def add_product_to_mycart(product_names: List[str], product_urls: List[str], prices: List[str]) -> str:
+def add_product_to_mycart(
+    product_names: List[str], product_urls: List[str], prices: List[str]
+) -> str:
     """사용자가 추천 혹은 검색된 상품을 장바구니에 추가하고자 할 때 사용하는 함수. 사용자 대화 히스토리를 기반으로 저장할 상품을 탐색합니다."""
     if not MONGODB_URI:
         return "데이터베이스 연결 정보(MONGODB_URI)가 설정되지 않았습니다."
 
     add_cart_list = []
-   
+
     for idx in range(len(product_names)):
         tmp_product = {
             "product_name": product_names[idx],
@@ -240,8 +246,8 @@ def add_product_to_mycart(product_names: List[str], product_urls: List[str], pri
 
     try:
         client = MongoClient(MONGODB_URI)
-        db = client['shopping']
-        collection = db['cart']
+        db = client["shopping"]
+        collection = db["cart"]
 
         if add_cart_list:
             result = collection.insert_many(add_cart_list)
@@ -254,9 +260,6 @@ def add_product_to_mycart(product_names: List[str], product_urls: List[str], pri
         return "장바구니에 상품을 추가하는 중 문제가 발생했습니다."
 
 
-
-
-
 tools = [get_naver_search_results, add_product_to_mycart]
 llm = ChatOpenAI(model="gpt-4o-mini", temperature=0, api_key=OPENAI_API_KEY)
 prompt = hub.pull("hwchase17/openai-functions-agent")
@@ -264,17 +267,18 @@ agent = create_openai_functions_agent(llm, tools, prompt)
 agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
 
 
-
-
 async def get_shopping_response_langchain(user_prompt: str):
     """에이전트를 사용하여 사용자의 쇼핑 관련 요청을 처리합니다."""
-    response = await agent_executor.ainvoke({
-        "input": user_prompt,
-    })
+    response = await agent_executor.ainvoke(
+        {
+            "input": user_prompt,
+        }
+    )
     return response["output"]
 
 
 import asyncio
+
 
 async def main():
     prompt1 = "따뜻한 겨울용 텀블러 추천해줘"
