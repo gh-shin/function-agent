@@ -12,9 +12,43 @@ load_dotenv()
 from dateutil.parser import parse as parse_datetime 
 
 import sys
-sys.path.append('/app/ica_project2/function-agent/') # 각 환경에 맞게 python path를 수정해야합니다 .
+sys.path.append('../function-agent/') # 각 환경에 맞게 python path를 수정해야합니다 .
 from function.mail_agent.src.main import create_mail_agent_executor
 from function.search_agent.src.main import create_search_agent_executor
+from function.shopping.shopping_tools import *
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # --- 전문가 에이전트(도구) 생성 및 등록 ---
 
