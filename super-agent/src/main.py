@@ -1,4 +1,3 @@
-from langchain.tools import Tool
 from openai import OpenAI
 
 import os
@@ -10,52 +9,14 @@ from langchain_core.messages import HumanMessage, AIMessage
 from datetime import datetime, timedelta
 
 load_dotenv()
-from dateutil.parser import parse as parse_datetime
 
-import sys
+from dateutil.parser import parse as parse_datetime 
+from tools import mail_agent, search_agent
+# --- 전문가 에이전트(도구) 생성 및 등록 ---
 
-sys.path.append("../function-agent/")  # 각 환경에 맞게 python path를 수정해야합니다 .
-from business_sub_agent import create_business_sub_agent
-from life_sub_agent import create_life_sub_agent
-from search_sub_agent import create_search_sub_agent
-
-# 각 분야별 sub agent
-business_agent = create_business_sub_agent()
-life_agent = create_life_sub_agent()
-search_agent = create_search_sub_agent()
-
-
-# orchestrator tools
-orchestrator_tools = [
-    Tool(
-        name="business_assitant",
-        func=lambda user_input: business_agent.invoke(
-            {
-                "input": user_input,
-            }
-        ),
-        description="""프롬프트트""",
-    ),
-    Tool(
-        name="search_assistant",
-        func=lambda user_input: search_agent.invoke(
-            {
-                "input": user_input,
-            }
-        ),
-        description="""프롬프트ㅜㅠㅠㅜ.""",
-    ),
-    Tool(
-        name="lift_assistant",
-        func=lambda user_input: life_agent.invoke(
-            {
-                "input": user_input,
-            }
-        ),
-        description="""프롬프트ㅜㅠㅠㅜ.""",
-    ),
-]
-
+tools_for_super_agent = [mail_agent, 
+                         search_agent,
+                         ]
 
 def create_super_agent(today_str: str):
     now = datetime.now().strftime("%Y-%m-%d")
