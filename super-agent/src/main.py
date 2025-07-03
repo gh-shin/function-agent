@@ -14,7 +14,7 @@ from dateutil.parser import parse as parse_datetime
 
 import sys
 
-sys.path.append("../function-agent/")  # 각 환경에 맞게 python path를 수정해야합니다 .
+sys.path.append("/app/ica_project2/function-agent/")
 from business_sub_agent import create_business_sub_agent
 from life_sub_agent import create_life_sub_agent
 from search_sub_agent import create_search_sub_agent
@@ -46,7 +46,7 @@ orchestrator_tools = [
         description="""프롬프트ㅜㅠㅠㅜ.""",
     ),
     Tool(
-        name="lift_assistant",
+        name="life_assistant",
         func=lambda user_input: life_agent.invoke(
             {
                 "input": user_input,
@@ -64,12 +64,12 @@ def create_super_agent(today_str: str):
             (
                 "system",
                 f"""You are a master AI assistant (super agent). 당신은 사용자의 복잡한 요청을 분석하여, 각 분야의 전문가 어시스턴트에게 작업을 정확히 분배하는 역할을 합니다.
-        사용 가능한 전문가 목록은 다음과 같습니다:
-        - email_management_specialist: 이메일 관련 모든 작업을 처리하는 전문가.
-        - web_search_specialist: 웹 검색 관련 모든 작업을 처리하는 전문가.
-        
-        오늘 날짜는 {now} 입니다다
-        """,
+                사용 가능한 전문가 목록은 다음과 같습니다:
+                - email_management_specialist: 이메일 관련 모든 작업을 처리하는 전문가.
+                - web_search_specialist: 웹 검색 관련 모든 작업을 처리하는 전문가.
+                
+                오늘 날짜는 {now} 입니다다
+                """,
             ),
             MessagesPlaceholder(variable_name="chat_history", optional=True),
             ("human", "{input}"),
