@@ -27,10 +27,17 @@ import asyncio
 from dotenv import load_dotenv
 from urllib.parse import quote, urlencode
 import traceback
+from pydantic import BaseModel, Field
+from langchain_openai import ChatOpenAI
+from langchain.agents import AgentExecutor, create_openai_functions_agent
+from langchain_core.tools import tool
+from langchain_core.pydantic_v1 import BaseModel, Field
+from langchain import hub
 
 load_dotenv()
 # --- 1. 설정: API 키 및 클라이언트 초기화 ---
 try:
+    OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
     # OpenAI 클라이언트 초기화
     client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
@@ -117,6 +124,16 @@ def transform_kcis_to_canonical(item: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
+class KrTourInfoInput(BaseModel):
+    keyword: str = Field(
+        description="한국 관광공사에서 제공하는 지역별 추천 여행지"
+    )
+    area_code: str = Field(
+        default="", description="검색할 지역의 코드: 1=서울, 2=인천, 3=대전, 4=대구, 5=광주, 6=부산, 7=울산, 8=세종, 31=경기도, 32=강원도, 33=충청북도, 34=충청남도, 35=경상북도, 36=경상남도, 37=전라북도, 38=전라남도, 39=제주도"
+    )
+
+
+@tool(args_schema=KrTourInfoInput)
 async def search_tourist_info(keyword: str, area_code: str = "") -> str:
     """한국관광공사 TourAPI를 호출하여 관광 정보를 검색합니다.
 

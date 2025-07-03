@@ -1,3 +1,8 @@
+from function.tour.kr_tour import *
+from function.weather.weather_tools import *
+from function.shopping.shopping_tools import *
+from function.place.naver_place_tools import *
+import sys
 from langchain.tools import Tool
 from openai import OpenAI
 
@@ -11,12 +16,8 @@ from datetime import datetime, timedelta
 
 load_dotenv()
 
-import sys
 
 sys.path.append("/app/ica_project2/function-agent/")
-from function.place.naver_place_tools import *
-from function.shopping.shopping_tools import *
-from function.weather.weather_tools import *
 
 
 def create_life_sub_agent(eval_mode=False):
@@ -38,17 +39,19 @@ def create_life_sub_agent(eval_mode=False):
     llm = ChatOpenAI(model="gpt-4.1-mini", temperature=0)
     tools = [
         search_naver_places,
+        search_tourist_info,
         get_naver_search_results,
         add_product_to_mycart,
         get_weather
     ]
 
     agent = create_openai_functions_agent(llm, tools, prompt)
-    agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True, return_intermediate_steps=True)
-    
+    agent_executor = AgentExecutor(
+        agent=agent, tools=tools, verbose=True, return_intermediate_steps=True)
+
     # if eval_mode:
     #     agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True, return_intermediate_steps=True)
     # else:
     #     agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=False)
-    
+
     return agent_executor
