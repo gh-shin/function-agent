@@ -87,6 +87,7 @@ def list_calendar_events(
     keyword: Optional[str] = None,
 ) -> Union[List[Dict[str, Any]], Dict[str, str]]:
     """
+    사용자의 스케쥴이나, 특정 시간에 있었을 장소를 추론할때 활용할 수 있는 함수입니다. 
     특정 기간이나 키워드로 Google 캘린더의 이벤트를 조회합니다. 날짜는 'YYYY-MM-DD' 형식이어야 합니다.
     오늘 날짜를 기준으로 조회하려면 start_date_str을 지정하지 마세요.
     """

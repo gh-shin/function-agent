@@ -22,7 +22,7 @@ class NaverPlaceSearchArgs(BaseModel):
 
 
 @tool(args_schema=NaverPlaceSearchArgs)
-async def search_naver_places(
+def search_naver_places(
     query: str, display: int = 5
 ) -> Union[List[Dict[str, Any]], str]:
     """
@@ -47,8 +47,8 @@ async def search_naver_places(
     }
 
     try:
-        async with httpx.AsyncClient() as client:
-            response = await client.get(url, headers=headers, params=params)
+        with httpx.Client() as client:
+            response = client.get(url, headers=headers, params=params)
             response.raise_for_status()
             data = response.json()
 

@@ -27,7 +27,10 @@ def create_life_sub_agent(eval_mode=False):
                 f"""
             ### Job Description
             당신은 생활 답변 전문 비서입니다. 사용자의 질문에 따라 장소, 날씨, 쇼핑 관련 함수를 수행하여 결과를 반환합니다.
-        """,
+
+            사용자의 스케쥴을 플레닝해줄 때는, 날씨를 먼저 확인해줘.
+            
+            """,
             ),
             MessagesPlaceholder(variable_name="chat_history", optional=True),
             ("human", "{input}"),
