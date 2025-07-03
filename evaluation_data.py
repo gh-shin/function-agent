@@ -53,7 +53,7 @@ EVALUATION_SET = [
         "expected_tool_calls": [
             {
                 "agent_name": "search_assistant",
-                "function_name": "tech_news_search",
+                "function_name": "tech_search_tool",
                 "argument_checks": {
                     "query": lambda arg: "AI" in arg and "TechCrunch" in arg
                 }
