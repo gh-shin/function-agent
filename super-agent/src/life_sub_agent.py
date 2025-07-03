@@ -16,6 +16,7 @@ import sys
 sys.path.append("../function-agent/")
 from function.place.naver_place_tools import *
 from function.shopping.shopping_tools import *
+from function.weather.weather_tools import *
 
 
 def create_life_sub_agent():
@@ -39,6 +40,7 @@ def create_life_sub_agent():
         search_naver_places,
         get_naver_search_results,
         add_product_to_mycart,
+        get_weather
     ]
 
     agent = create_openai_functions_agent(llm, tools, prompt)
