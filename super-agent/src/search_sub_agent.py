@@ -13,7 +13,7 @@ load_dotenv()
 
 import sys
 
-sys.path.append("../function-agent/")
+sys.path.append("/app/ica_project2/function-agent/")
 from function.search_agent.src.main import (
     tavily_qa_tool,
     tech_search_tool,
@@ -21,7 +21,7 @@ from function.search_agent.src.main import (
 )
 
 
-def create_search_sub_agent():
+def create_search_sub_agent(eval_mode=False):
     prompt = ChatPromptTemplate.from_messages(
         [
             (
@@ -46,6 +46,9 @@ def create_search_sub_agent():
     ]
 
     agent = create_openai_functions_agent(llm, tools, prompt)
-    agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=False)
-
+    # if eval_mode:
+    #     agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True, return_intermediate_steps=True)
+    # else:
+    #     agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=False)
+    agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True, return_intermediate_steps=True)
     return agent_executor
