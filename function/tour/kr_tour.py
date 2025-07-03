@@ -126,7 +126,7 @@ def transform_kcis_to_canonical(item: Dict[str, Any]) -> Dict[str, Any]:
 
 class KrTourInfoInput(BaseModel):
     keyword: str = Field(
-        description="한국 관광공사에서 제공하는 지역별 추천 여행지"
+        description="한국 관광공사에서 제공하는 지역별 추천 여행지 관련 키워드"
     )
     area_code: str = Field(
         default="", description="검색할 지역의 코드: 1=서울, 2=인천, 3=대전, 4=대구, 5=광주, 6=부산, 7=울산, 8=세종, 31=경기도, 32=강원도, 33=충청북도, 34=충청남도, 35=경상북도, 36=경상남도, 37=전라북도, 38=전라남도, 39=제주도"
@@ -137,7 +137,7 @@ class KrTourInfoInput(BaseModel):
 async def search_tourist_info(keyword: str, area_code: str = "") -> str:
     """한국관광공사 TourAPI를 호출하여 관광 정보를 검색합니다.
 
-    키워드, 지역 코드, 콘텐츠 유형 ID를 사용하여 관광 정보를 조회하고,
+    키워드, 지역 코드를 사용하여 관광 정보를 조회하고,
     결과를 JSON 형식의 문자열로 반환합니다.
 
     Args:
