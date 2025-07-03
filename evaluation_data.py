@@ -16,7 +16,7 @@ EVALUATION_SET = [
         "expected_tool_calls": [
             {
                 "agent_name": "search_assistant",
-                "function_name": "tavily_qa_tool",
+                "function_name": "general_question_answering",
                 "argument_checks": {
                     "query": lambda arg: "LLM" in arg and "RAG" in arg
                 }
@@ -53,7 +53,7 @@ EVALUATION_SET = [
         "expected_tool_calls": [
             {
                 "agent_name": "search_assistant",
-                "function_name": "tech_search_tool",
+                "function_name": "tech_news_search",
                 "argument_checks": {
                     "query": lambda arg: "AI" in arg and "TechCrunch" in arg
                 }
@@ -133,7 +133,7 @@ EVALUATION_SET = [
         "expected_tool_calls": [
             {
                 "agent_name": "life_assistant",
-                "function_name": "search_naver_place",
+                "function_name": "search_naver_places",
                 "argument_checks": {
                     "query": lambda arg: "강남" in arg and ("술" in arg or "저녁" in arg)
                 }
@@ -153,14 +153,14 @@ EVALUATION_SET = [
         "expected_tool_calls": [
             {
                 "agent_name": "life_assistant",
-                "function_name": "search_naver_place",
+                "function_name": "search_naver_places",
                 "argument_checks": {
                     "query": lambda arg: "강원도" in arg and "애견펜션" in arg
                 }
             },
             {
                 "agent_name": "life_assistant",
-                "function_name": "search_naver_place",
+                "function_name": "search_naver_places",
                 "argument_checks": {
                     "query": lambda arg: ("근처" in arg or "주변" in arg) and ("강아지" in arg or "애견" in arg)
                 }

@@ -34,7 +34,10 @@ orchestrator_tools = [
                 "input": user_input,
             }
         ),
-        description="""프롬프트트""",
+        description=""" 
+            해당 도구는 업무를 보조하는 agent 입니다. 
+            1. 메일을 검색하거나 메일 초록을 작성하거나, 메일 내용을 요약이 필요할때 활용할 수 있습니다.
+            2. 캘린더 일정을 확인하거나 생성, 수정, 삭제하는 등이 필요할때 활용할 수 있습니다.""",
     ),
     Tool(
         name="search_assistant",
@@ -43,7 +46,12 @@ orchestrator_tools = [
                 "input": user_input,
             }
         ),
-        description="""프롬프트ㅜㅠㅠㅜ.""",
+        description="""
+            해당 도구는 사용자의 요청에 맞는 정보를 검색하는 agent 입니다.
+            1. 일반적인 웹 검색이 가능하고.
+            2. 특정 도메인에 대한 전문 검색도 가능합니다.
+            3. 필요한 정보를 직접 찾아볼 수 있게 링크만 정리해줄 수 도 있습니다.
+            """,
     ),
     Tool(
         name="life_assistant",
@@ -52,7 +60,12 @@ orchestrator_tools = [
                 "input": user_input,
             }
         ),
-        description="""프롬프트ㅜㅠㅠㅜ.""",
+        description="""
+            해당 도구는 생활 편의성을 돕는 어시스턴트입니다.
+            1. 사용자가 장소를 검색하고자 할 때 사용할 수 있습니다.
+            2. 특정 장소에 대한 날씨 검색 혹은 장소 추천 시 날씨 검색을 할 때 사용할 수 있습니다.
+            3. 쇼핑 상품을 검색하거나 장바구니에 저장하고자 할 때 사용할 수 있습니다.
+            """,
     ),
 ]
 
@@ -65,9 +78,10 @@ def create_super_agent(today_str: str):
                 "system",
                 f"""You are a master AI assistant (super agent). 당신은 사용자의 복잡한 요청을 분석하여, 각 분야의 전문가 어시스턴트에게 작업을 정확히 분배하는 역할을 합니다.
                 사용 가능한 전문가 목록은 다음과 같습니다:
-                - email_management_specialist: 이메일 관련 모든 작업을 처리하는 전문가.
-                - web_search_specialist: 웹 검색 관련 모든 작업을 처리하는 전문가.
-                
+                    - business_assitant : 해당 도구는 업무를 보조하는 agent 입니다. 
+                    - search_assistant : 해당 도구는 사용자의 요청에 맞는 정보를 검색하는 agent 입니다.
+                    - life_assistant : 해당 도구는 생활 편의성을 돕는 어시스턴트입니다.
+
                 오늘 날짜는 {now} 입니다다
                 """,
             ),
@@ -85,20 +99,19 @@ def create_super_agent(today_str: str):
     return agent_executor
 
 
+
 if __name__ == "__main__":
     from evaluation_data import EVALUATION_SET
 
-
     load_dotenv()
     today_str = datetime.now().strftime("%Y-%m-%d")
+    today_str += f" AM 10:30"
     super_agent = create_super_agent(today_str = today_str)
     total_result = {}
     for eval_data in EVALUATION_SET:
-        # eval_data = EVALUATION_SET[5]
+        eval_data = EVALUATION_SET[9]
         query = eval_data['query']
         total_step = len(eval_data['expected_tool_calls'])
-        
-        today_str = datetime.now().strftime("%Y-%m-%d")
 
         print(f"\n==================================================")
         print(f"[사용자 쿼리]: {query}")
@@ -112,7 +125,6 @@ if __name__ == "__main__":
 
         ai_response = result['output']
         print(f"\n[슈퍼 에이전트 최종 답변]: {ai_response}")
-        print(result['intermediate_steps'])
         acc_depth_1 = 0
         acc_depth_2 = 0
         for i in range(total_step):
@@ -127,6 +139,7 @@ if __name__ == "__main__":
 
         print(f"[사용자 쿼리]: {query}")
         print(f'accuracy : {acc_depth_1, total_step}, {acc_depth_2, total_step}')
-        total_result[query] = f'accuracy : {acc_depth_1, total_step}, {acc_depth_2, total_step}'
-    
+        total_result[query] = {"accuracy" : f'{acc_depth_1, total_step}, {acc_depth_2, total_step}',
+                               "logs" : result["intermediate_steps"]}
+        break
     print(total_result)

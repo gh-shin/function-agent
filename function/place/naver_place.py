@@ -69,7 +69,7 @@ class NaverPlaceSearchRequest(BaseModel):
     sort: Optional[str] = Field("random", description="정렬 방법(random/comment)")
 
 # 시간복잡도: O(1) (단일 HTTP 요청)
-async def search_naver_place(
+def search_naver_place(
     req: NaverPlaceSearchRequest
 ) -> NaverPlaceSearchResponse:
     """네이버 지역 검색 API를 호출하여 결과를 반환합니다.
@@ -93,8 +93,8 @@ async def search_naver_place(
         "start": req.start,
         "sort": req.sort,
     }
-    async with httpx.AsyncClient() as client:
-        response = await client.get(url, headers=headers, params=params)
+    with httpx.Client() as client:
+        response = client.get(url, headers=headers, params=params)
         response.raise_for_status()
         data = response.json()
         # print(f'receive naver place: {data}')
