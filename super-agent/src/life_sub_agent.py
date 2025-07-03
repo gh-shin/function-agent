@@ -13,13 +13,13 @@ load_dotenv()
 
 import sys
 
-sys.path.append("../function-agent/")
+sys.path.append("/app/ica_project2/function-agent/")
 from function.place.naver_place_tools import *
 from function.shopping.shopping_tools import *
 from function.weather.weather_tools import *
 
 
-def create_life_sub_agent():
+def create_life_sub_agent(eval_mode=False):
     prompt = ChatPromptTemplate.from_messages(
         [
             (
@@ -44,6 +44,11 @@ def create_life_sub_agent():
     ]
 
     agent = create_openai_functions_agent(llm, tools, prompt)
-    agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=False)
-
+    agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True, return_intermediate_steps=True)
+    
+    # if eval_mode:
+    #     agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True, return_intermediate_steps=True)
+    # else:
+    #     agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=False)
+    
     return agent_executor
